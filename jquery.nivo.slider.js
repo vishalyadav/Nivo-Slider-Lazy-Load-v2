@@ -98,7 +98,7 @@
         
         // Set first background
 		//preload_image(0); //the first image is a src image
-		var sliderImg = $('<img class="nivo-main-image" src="#" />');
+		var sliderImg = $('<img class="nivo-main-image" src="" />');
         //sliderImg.attr('src', vars.currentImage.attr('src')).show();
 		sliderImg.attr('src', parse_src(vars.currentImage)).show();//ADDED
         slider.append(sliderImg);
@@ -179,14 +179,39 @@
                 clearInterval(timer);
                 timer = '';
                 vars.currentSlide -= 2;
-                nivoRun(slider, kids, settings, 'prev');
+	              if(vars.currentSlide < -1){
+		              var nextImage = parse_image(vars.totalSlides - 1);
+	              }
+	              else {
+		                var nextImage = parse_image(vars.currentSlide + 1);
+	              }
+                
+                nextImage.attr('src', parse_src(nextImage));
+                if(nextImage.prop('naturalHeight') > 0) {
+                   nivoRun(slider, kids, settings, 'prev');
+                }
+                else {
+                   nextImage.load(function(){nivoRun(slider, kids, settings, 'prev')});
+                }
             });
             
             $('a.nivo-nextNav', slider).live('click', function(){
                 if(vars.running) { return false; }
                 clearInterval(timer);
                 timer = '';
-                nivoRun(slider, kids, settings, 'next');
+                if(vars.currentSlide == vars.totalSlides - 1) {
+                    var nextImage = parse_image(0);
+                }
+                else {
+                    var nextImage = parse_image(vars.currentSlide + 1);
+                }
+                nextImage.attr('src', parse_src(nextImage));
+                if(nextImage.prop('naturalHeight') > 0) {
+                    nivoRun(slider, kids, settings, 'next');
+                }
+                else {
+                    nextImage.load(function(){nivoRun(slider, kids, settings, 'next')});
+                }
             });
         }
         
@@ -215,10 +240,15 @@
                 if($(this).hasClass('active')) return false;
                 clearInterval(timer);
                 timer = '';
-                //sliderImg.attr('src', vars.currentImage.attr('src'));
-				sliderImg.attr('src', parse_src(vars.currentImage)); //ADDED
                 vars.currentSlide = $(this).attr('rel') - 1;
-                nivoRun(slider, kids, settings, 'control');
+                var nextImage = parse_image($(this).attr('rel'));
+                nextImage.attr('src', parse_src(nextImage));
+                if(nextImage.prop('naturalHeight') > 0) {
+                    nivoRun(slider, kids, settings, 'control');
+                }
+                else {
+                    nextImage.load(function(){nivoRun(slider, kids, settings, 'control')});
+                }
             });
         }
         
