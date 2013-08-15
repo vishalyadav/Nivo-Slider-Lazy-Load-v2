@@ -81,6 +81,7 @@
 			else if (nxt < 0) nxt = 0;
 			var img = parse_image(nxt);
 			img.attr('src', img.data('src'));
+            settings.onImageLoad.call(this, img);
         }
 		// END ADDED
         
@@ -102,6 +103,8 @@
         //sliderImg.attr('src', vars.currentImage.attr('src')).show();
 		sliderImg.attr('src', parse_src(vars.currentImage)).show();//ADDED
         slider.append(sliderImg);
+        settings.onImageLoad.call(this, vars.currentImage);
+        settings.onImageChange.call(this, vars.currentImage);
 		
         // If randomStart
         if(settings.randomStart){
@@ -443,6 +446,8 @@
                 $('a:eq('+ vars.currentSlide +')', vars.controlNavEl).addClass('active');
             }
             
+            settings.onImageChange.call(this, vars.currentImage);
+
             // Process caption
             processCaption(settings);            
             
@@ -764,9 +769,34 @@
         afterChange: function(){},
         slideshowEnd: function(){},
         lastSlide: function(){},
-        afterLoad: function(){}
+        afterLoad: function(){},
+        onImageLoad: function(img) {},
+        onImageChange: function() {}
     };
 
     $.fn._reverse = [].reverse;
     
 })(jQuery);
+
+//My configured default settings
+
+$(window).load(function() {
+        //To sanity check whether or not images being lazy loaded
+        //Add #imgloag_txt, #imgshow_txt to your html
+
+        var imgload = $('#imgload_txt');
+        var imgshow = $('#imgshow_txt');
+        $('#slider').nivoSlider({
+            pauseTime: 5000,
+        onImageLoad: function(img) {
+            imgload.hide();
+            imgload.html(img.attr('src'));
+            imgload.fadeIn();
+        },
+        onImageChange: function(img) {
+            imgshow.hide();
+            imgshow.html(img.attr('src'));
+            imgshow.fadeIn();
+        }
+    });
+});
